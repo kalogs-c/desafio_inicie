@@ -1,20 +1,57 @@
 import axios from "axios";
 import { Router, Request, Response } from "express";
-import { envs } from "../../envs.config";
+import { stringify } from "flatted";
+import { sortAnNumberArray } from "./../lib/sortFunction";
 
 export const router = Router();
 
 const getAPILink = (state: any, date: any) =>
-  `https://brasil.io/api/dataset/covid19/caso/data/?state=${state}&date=${date}`;
+  `https://api.brasil.io/v1/dataset/covid19/caso/data/?state=${state}&date=${date}`;
 
 router.get("/", async (req: Request, res: Response) => {
-  const state = req.query.state;
-  const dateStart = req.query.dateStart;
-  const callback = await axios(getAPILink(state, dateStart), {
+  const { state, dateStart } = req.query;
+  const callback: any = await axios({
+    method: "GET",
+    url: getAPILink(state, dateStart),
     headers: {
-      Authorization: envs.API_KEY,
+      Authorization: `Token cd06accc7cba9e0b48b4d3106f3ea4359f593725`,
     },
   });
 
-  res.send(callback);
+  const allData = callback.data.results;
+  const allCases = allData.map((city: any) => {
+    const cityName: string = city.city;
+    const cases: number = city.confirmed;
+    const population: number = city.estimated_population;
+
+    if (cases === null || population === null) return;
+
+    const percentCases = cases / population;
+    const data = {
+      city: cityName,
+      percentCases: (percentCases * 100).toFixed(5),
+    };
+    return data;
+  });
+
+  const sortedCases = sortAnNumberArray(allCases);
+  const top10Cases: any = sortedCases.slice(0, 10);
+  console.table(top10Cases);
+
+  top10Cases.forEach(async (city: any, i: number) => {
+    await axios({
+      method: "POST",
+      url: "https://us-central1-lms-nuvem-mestra.cloudfunctions.net/testApi",
+      headers: {
+        MeuNome: "Carlos Camilo",
+      },
+      data: {
+        id: i,
+        nomeCidade: city.cityName,
+        percentualDeCasos: city.percentCases,
+      },
+    });
+  });
+
+  res.json(top10Cases);
 });
