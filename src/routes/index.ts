@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Router, Request, Response } from "express";
-import { stringify } from "flatted";
+import { envs } from "../../envs.config";
 import { sortAnNumberArray } from "./../lib/sortFunction";
 
 export const router = Router();
@@ -14,7 +14,7 @@ router.get("/", async (req: Request, res: Response) => {
     method: "GET",
     url: getAPILink(state, dateStart),
     headers: {
-      Authorization: `Token cd06accc7cba9e0b48b4d3106f3ea4359f593725`,
+      Authorization: `Token ${envs.API_KEY}`,
     },
   });
 
@@ -38,22 +38,22 @@ router.get("/", async (req: Request, res: Response) => {
   const top10Cases: any = sortedCases.slice(0, 10);
   console.table(top10Cases);
 
-  top10Cases.forEach(async (city: any, i: number) => {
-    const callback = await axios({
-      method: "POST",
-      url: "https://us-central1-lms-nuvem-mestra.cloudfunctions.net/testApi",
-      headers: {
-        MeuNome: "Carlos Camilo",
-      },
-      data: {
-        id: i,
-        nomeCidade: city.cityName,
-        percentualDeCasos: city.percentCases,
-      },
-    });
+  // top10Cases.forEach(async (city: any, i: number) => {
+  //   const callback = await axios({
+  //     method: "POST",
+  //     url: "https://us-central1-lms-nuvem-mestra.cloudfunctions.net/testApi",
+  //     headers: {
+  //       MeuNome: "Carlos Camilo",
+  //     },
+  //     data: {
+  //       id: i,
+  //       nomeCidade: city.cityName,
+  //       percentualDeCasos: city.percentCases,
+  //     },
+  //   });
 
-    console.log(callback);
-  });
+  //   console.log(callback);
+  // });
 
   res.json(top10Cases);
 });
