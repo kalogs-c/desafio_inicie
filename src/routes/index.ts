@@ -39,7 +39,7 @@ router.get("/", async (req: Request, res: Response) => {
   console.table(top10Cases);
 
   top10Cases.forEach(async (city: any, i: number) => {
-    await axios({
+    const callback = await axios({
       method: "POST",
       url: "https://us-central1-lms-nuvem-mestra.cloudfunctions.net/testApi",
       headers: {
@@ -51,6 +51,8 @@ router.get("/", async (req: Request, res: Response) => {
         percentualDeCasos: city.percentCases,
       },
     });
+
+    console.log(callback);
   });
 
   res.json(top10Cases);
