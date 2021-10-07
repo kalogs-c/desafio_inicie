@@ -38,22 +38,22 @@ router.get("/", async (req: Request, res: Response) => {
   const top10Cases: any = sortedCases.slice(0, 10);
   console.table(top10Cases);
 
-  // top10Cases.forEach(async (city: any, i: number) => {
-  //   const callback = await axios({
-  //     method: "POST",
-  //     url: "https://us-central1-lms-nuvem-mestra.cloudfunctions.net/testApi",
-  //     headers: {
-  //       MeuNome: "Carlos Camilo",
-  //     },
-  //     data: {
-  //       id: i,
-  //       nomeCidade: city.cityName,
-  //       percentualDeCasos: city.percentCases,
-  //     },
-  //   });
+  top10Cases.forEach(async (city: any, i: number) => {
+    const callback = await axios({
+      method: "POST",
+      url: "https://us-central1-lms-nuvem-mestra.cloudfunctions.net/testApi",
+      headers: {
+        MeuNome: "Carlos Camilo",
+      },
+      data: {
+        id: i,
+        nomeCidade: city.cityName,
+        percentualDeCasos: city.percentCases,
+      },
+    });
 
-  //   console.log(callback);
-  // });
+    console.log(callback);
+  });
 
   res.json(top10Cases);
 });
